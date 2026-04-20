@@ -1,13 +1,21 @@
-# TRINETRA Landing Page
+# TRINETRA Project
 
-Modern React + Tailwind CSS landing page for TRINETRA, an AI Traffic Violation System.
+TRINETRA is organized into separate frontend and backend applications for cleaner development and deployment.
 
 ## Scripts
 
-- `npm install` - install dependencies
-- `npm run dev` - start development server
-- `npm run build` - build production assets
-- `npm run preview` - preview built app
+- Frontend:
+	- `cd frontend`
+	- `npm install` - install dependencies
+	- `npm run dev` - start development server
+	- `npm run build` - build production assets
+	- `npm run preview` - preview built app
+
+- Backend:
+	- `cd backend`
+	- `python -m venv venv`
+	- `venv\Scripts\python -m pip install -r requirements.txt`
+	- `venv\Scripts\python -m uvicorn app.main:app --reload --port 8000`
 
 ## Features
 
@@ -30,7 +38,7 @@ Modern React + Tailwind CSS landing page for TRINETRA, an AI Traffic Violation S
 
 ## Notes
 
-- Modular component structure in `src/components`
+- Frontend source lives in `frontend/src/components`
 - Routing support added with `react-router-dom`
 - Protected routes with authentication guards
 - Role-based UI and navigation
