@@ -3,6 +3,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 import random
+import torch
 from collections import defaultdict
 from ultralytics import YOLO
 
@@ -10,6 +11,16 @@ from app.models.violation import ViolationCreateSchema, VehicleType, ViolationSe
 
 
 # Load YOLOv8 model with tracking
+# PyTorch 2.6+ defaults to weights_only=True; YOLO checkpoints need full load.
+_original_torch_load = torch.load
+
+
+def _torch_load_with_full_checkpoint(*args, **kwargs):
+    kwargs.setdefault("weights_only", False)
+    return _original_torch_load(*args, **kwargs)
+
+
+torch.load = _torch_load_with_full_checkpoint
 model = YOLO('yolov8n.pt')
 
 # Class IDs
