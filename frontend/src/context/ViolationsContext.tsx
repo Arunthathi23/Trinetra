@@ -51,8 +51,9 @@ export const ViolationsProvider: React.FC<ViolationsProviderProps> = ({ children
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<number>(0);
 
-  // WebSocket for real-time alerts
-  const { alerts: websocketAlerts, isConnected, lastAlert } = useWebSocket('ws://localhost:8000/ws/violations');
+  // Keep global alerts on a non-camera stream so local webcam remains available
+  // for explicit user actions like "Start Webcam" in the Explainable AI page.
+  const { alerts: websocketAlerts, isConnected, lastAlert } = useWebSocket('ws://localhost:8000/ws/violations?video_source=dummy');
 
   // Transform WebSocket alerts to Violation format
   const transformedWebsocketAlerts = useMemo(() =>

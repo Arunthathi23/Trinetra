@@ -18,12 +18,14 @@ export function useWebSocket(url: string) {
   const [alerts, setAlerts] = useState<ViolationAlert[]>([]);
   const [lastAlert, setLastAlert] = useState<ViolationAlert | null>(null);
   const ws = useRef<WebSocket | null>(null);
-  const reconnectTimeout = useRef<NodeJS.Timeout>();
+  const reconnectTimeout = useRef<ReturnType<typeof setTimeout>>();
   const reconnectAttempts = useRef(0);
+  const shouldReconnect = useRef(true);
   const maxReconnectAttempts = 5;
 
   const connect = useCallback(() => {
-    if (ws.current?.readyState === WebSocket.OPEN) return;
+    if (!shouldReconnect.current) return;
+    if (ws.current?.readyState === WebSocket.OPEN || ws.current?.readyState === WebSocket.CONNECTING) return;
 
     try {
       ws.current = new WebSocket(url);
@@ -56,9 +58,10 @@ export function useWebSocket(url: string) {
       ws.current.onclose = () => {
         console.log('WebSocket disconnected');
         setIsConnected(false);
+        ws.current = null;
 
         // Attempt to reconnect
-        if (reconnectAttempts.current < maxReconnectAttempts) {
+        if (shouldReconnect.current && reconnectAttempts.current < maxReconnectAttempts) {
           reconnectAttempts.current += 1;
           reconnectTimeout.current = setTimeout(() => {
             console.log(`Attempting to reconnect (${reconnectAttempts.current}/${maxReconnectAttempts})`);
@@ -76,15 +79,22 @@ export function useWebSocket(url: string) {
   }, [url]);
 
   const disconnect = useCallback(() => {
+    shouldReconnect.current = false;
     if (reconnectTimeout.current) {
       clearTimeout(reconnectTimeout.current);
+      reconnectTimeout.current = undefined;
     }
     if (ws.current) {
-      ws.current.close();
+      if (ws.current.readyState === WebSocket.OPEN || ws.current.readyState === WebSocket.CONNECTING) {
+        ws.current.close();
+      }
+      ws.current = null;
     }
+    setIsConnected(false);
   }, []);
 
   useEffect(() => {
+    shouldReconnect.current = true;
     connect();
 
     return () => {

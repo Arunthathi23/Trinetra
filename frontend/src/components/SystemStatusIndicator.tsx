@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
 import { Wifi, WifiOff, Activity } from 'lucide-react';
-import { useWebSocket } from '../hooks/useWebSocket';
+import { useViolations } from '../context/ViolationsContext';
 
 export function SystemStatusIndicator() {
-  const { isConnected } = useWebSocket('ws://localhost:8000/ws/violations');
+  const { isConnected } = useViolations();
 
   return (
     <motion.div

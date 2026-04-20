@@ -8,7 +8,7 @@ from fastapi import APIRouter, File, HTTPException, UploadFile, status, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from app.models.database import get_db
+from app.models.database import Violation as DBViolation, get_db
 from app.services.detection_service import detect_frame_image, process_video
 
 router = APIRouter()
@@ -60,7 +60,6 @@ async def upload_video(file: UploadFile = File(...), db: Session = Depends(get_d
         violations = process_video(str(destination_path))
         # Save violations to database
         for violation in violations:
-            from app.models.database import DBViolation
             db_violation = DBViolation(
                 id=str(uuid4()),
                 vehicle_number=violation.vehicle_number,
